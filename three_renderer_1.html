@@ -1,0 +1,88 @@
+<html>
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/99/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.101.1/examples/js/controls/OrbitControls.js"></script>
+  <style>
+    body {
+      margin: 0;
+      overflow: hidden;
+    }
+  </style>
+  <script>
+    window.addEventListener('load', init);
+    let camera, renderer;   //画面リサイズに対応
+    function init() {
+      // サイズを指定
+      // const width = 712;
+      // const height = 397;
+      const width = window.innerWidth;
+      const height = window.innerHeight;
+      // カンバス設定
+      const canvasElement = document.querySelector('#myCanvas')
+      // レンダラーを作成
+      const renderer = new THREE.WebGLRenderer({
+        //描画するカンバスの指定
+        canvas: canvasElement
+      });
+      //renderer.setPixelRatio(window.devicePixelRatio);
+      renderer.setSize(width, height);
+      //renderer.setSize(window.innerWidth, window.innerHeight);    //画面リサイズに対応
+
+      // シーンで3D空間を作成する
+      const scene = new THREE.Scene();
+
+      // カメラを作成し視点の指定をする
+      // camera = new THREE.PerspectiveCamera(45, width / height);
+      const camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 1, 5000);
+      camera.position.set(0, 0, +1000);
+
+      const controls = new THREE.OrbitControls(camera, canvasElement);
+
+      // オブジェクトである四角形の箱を作成
+      // const geometry = new THREE.BoxGeometry(400, 400, 400);
+      const geometry = new THREE.BoxGeometry(300, 300, 300);    //画面リサイズに対応
+      // マテリアルにテクスチャーを設定
+      const material = new THREE.MeshNormalMaterial();
+      // const material = new THREE.MeshBasicMaterial({ color: '#124dae' });  //素材を変えることができる
+      // meshで形、素材を設定し作成する
+      const box = new THREE.Mesh(geometry, material);
+      scene.add(box);
+      animate();
+
+      // 毎フレーム時に実行されるイベント
+      function animate() {
+        //箱を回転させる
+        //ここの数値を変えると回転速度が変わる
+        box.rotation.x += 0.005;
+        box.rotation.y += 0.006;
+
+        controls.update();
+        // sceneとcameraオブジェクトを渡してレンダリングする
+        renderer.render(scene, camera);
+        requestAnimationFrame(animate);
+      }
+      //画面リサイズに対応
+      window.addEventListener('resize', onWindowResize, false);
+
+      //画面リサイズに対応
+      function onWindowResize() {
+        renderer.setPixelRatio(window.devicePixelRatio);
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+      }
+
+    }
+
+  </script>
+</head>
+
+<body>
+  <!-- この領域に描画 -->
+  <canvas id="myCanvas"></canvas>
+</body>
+
+</html>
