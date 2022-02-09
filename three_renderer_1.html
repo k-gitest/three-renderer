@@ -3,8 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/99/three.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/three@0.101.1/examples/js/controls/OrbitControls.js"></script>
+
   <style>
     body {
       margin: 0;
@@ -14,22 +13,26 @@
   <script>
     window.addEventListener('load', init);
     let camera, renderer;   //画面リサイズに対応
+
     function init() {
       // サイズを指定
       // const width = 712;
       // const height = 397;
-      const width = window.innerWidth;
-      const height = window.innerHeight;
+      let width = window.innerWidth;
+      let height = window.innerHeight;
+
       // カンバス設定
       const canvasElement = document.querySelector('#myCanvas')
       // レンダラーを作成
       const renderer = new THREE.WebGLRenderer({
         //描画するカンバスの指定
-        canvas: canvasElement
+        canvas: canvasElement,
+        antialias: true,
       });
       //renderer.setPixelRatio(window.devicePixelRatio);
-      renderer.setSize(width, height);
-      //renderer.setSize(window.innerWidth, window.innerHeight);    //画面リサイズに対応
+      //renderer.setSize(width, height);
+      //画面リサイズに対応
+      renderer.setSize(window.innerWidth, window.innerHeight);
 
       // シーンで3D空間を作成する
       const scene = new THREE.Scene();
@@ -37,9 +40,13 @@
       // カメラを作成し視点の指定をする
       // camera = new THREE.PerspectiveCamera(45, width / height);
       const camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 1, 5000);
-      camera.position.set(0, 0, +1000);
-
+      //カメラ位置初期座標(x,y,z)
+      camera.position.set(0, 0, +2000);
+      // カメラコントローラーを作成
       const controls = new THREE.OrbitControls(camera, canvasElement);
+      // 滑らかにカメラコントローラーを制御する
+      controls.enableDamping = true;
+      controls.dampingFactor = 0.9;
 
       // オブジェクトである四角形の箱を作成
       // const geometry = new THREE.BoxGeometry(400, 400, 400);
@@ -49,7 +56,45 @@
       // const material = new THREE.MeshBasicMaterial({ color: '#124dae' });  //素材を変えることができる
       // meshで形、素材を設定し作成する
       const box = new THREE.Mesh(geometry, material);
+      //box.position.set(300, 0, 0)
+      box.position.x = window.innerWidth / 3 * 3;
+      //box.rotation.x = 1;
       scene.add(box);
+
+      const geometry2 = new THREE.BoxGeometry(300, 300, 300);    //画面リサイズに対応
+      // マテリアルにテクスチャーを設定
+      const material2 = new THREE.MeshNormalMaterial();
+      // const material = new THREE.MeshBasicMaterial({ color: '#124dae' });  //素材を変えることができる
+      // meshで形、素材を設定し作成する
+      const box2 = new THREE.Mesh(geometry2, material2);
+      //box.position.set(300, 0, 0)
+      box2.position.x = window.innerWidth / 3 * -3;
+      //box.rotation.x = 1;
+      scene.add(box2);
+
+      // ドーナツを作成(radius,tube,radialseg,tubuseg)
+      const geoTorus = new THREE.TorusGeometry(300, 90, 64, 100);
+      // マテリアルを作成
+      const matBasic = new THREE.MeshNormalMaterial({ color: 0x6699FF });
+      // メッシュを作成
+      const mesh = new THREE.Mesh(geoTorus, matBasic);
+      mesh.position.x = 0;
+      //mesh.receiveShadow = true;
+      scene.add(mesh);
+
+      // ライトを当てる
+      var light = new THREE.DirectionalLight(0xffffff, 1);
+      light.position.set(0, 100, 30);
+      scene.add(light);
+
+      var ambient = new THREE.AmbientLight(0x550000);
+      scene.add(ambient);
+
+
+
+
+
+
       animate();
 
       // 毎フレーム時に実行されるイベント
@@ -59,12 +104,17 @@
         box.rotation.x += 0.005;
         box.rotation.y += 0.006;
 
+        box2.rotation.x += 0.005;
+        box2.rotation.y += 0.006;
+        //box.position.x = window.innerWidth / 3 * 3;
+
         controls.update();
         // sceneとcameraオブジェクトを渡してレンダリングする
         renderer.render(scene, camera);
         requestAnimationFrame(animate);
       }
       //画面リサイズに対応
+      //onWindowResize();
       window.addEventListener('resize', onWindowResize, false);
 
       //画面リサイズに対応
@@ -83,6 +133,10 @@
 <body>
   <!-- この領域に描画 -->
   <canvas id="myCanvas"></canvas>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/99/three.min.js"></script>
+  <!-- カメラ周回軌道やポインター操作・アングル変更 -->
+  <script src="https://cdn.jsdelivr.net/npm/three@0.101.1/examples/js/controls/OrbitControls.js"></script>
 </body>
 
 </html>
